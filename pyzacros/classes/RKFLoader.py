@@ -208,7 +208,7 @@ class RKFLoader:
                     if( bs in attachedMolecule[idReactant].keys() ):
                         species[i] = attachedMolecule[idTS][bs]
 
-                clusterReactant = Cluster( site_types=tuple([ labels[j] for j in connectedSites ]),
+                clusterReactant = Cluster( site_types=[ labels[j] for j in connectedSites ],
                                            neighboring=neighboring,
                                            species=SpeciesList( [ Species(f+"*",1) for f in species ] ),
                                            multiplicity=2,
@@ -222,7 +222,7 @@ class RKFLoader:
                     if( bs in attachedMolecule[idProduct].keys() ):
                         species[i] = attachedMolecule[idTS][bs]
 
-                clusterProduct = Cluster( site_types=tuple([ labels[j] for j in connectedSites ]),
+                clusterProduct = Cluster( site_types=[ labels[j] for j in connectedSites ],
                                           neighboring=neighboring,
                                           species=SpeciesList( [ Species(f+"*",1) for f in species ] ),
                                           multiplicity=2,
@@ -233,7 +233,7 @@ class RKFLoader:
                 # Reaction
                 activationEnergy = state2Energy[idTS]-state2Energy[idReactant]
 
-                reaction = ElementaryReaction( site_types=tuple([ labels[j] for j in connectedSites ]),
+                reaction = ElementaryReaction( site_types=[ labels[j] for j in connectedSites ],
                                                neighboring=neighboring,
                                                initial=clusterReactant,
                                                final=clusterProduct,

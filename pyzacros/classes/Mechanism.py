@@ -59,12 +59,17 @@ class Mechanism(UserList):
         self.__clustersList = []
 
         for reaction in self:
-            self.__clustersList.append( reaction.initial )
-            self.__clustersList.append( reaction.final )
+            simplifiedCluster = reaction.initial.simplify()
+            if( simplifiedCluster is not None ):
+                self.__clustersList.append( simplifiedCluster )
+
+            simplifiedCluster = reaction.final.simplify()
+            if( simplifiedCluster is not None ):
+                self.__clustersList.append( simplifiedCluster )
 
         # Remove duplicates
-        self.__clustersList = SpeciesList(dict.fromkeys(self.__clustersList))
-        self.__clustersList = SpeciesList(dict.fromkeys(self.__clustersList))
+        self.__clustersList = list(dict.fromkeys(self.__clustersList))
+        self.__clustersList = list(dict.fromkeys(self.__clustersList))
 
 
     def species( self ):

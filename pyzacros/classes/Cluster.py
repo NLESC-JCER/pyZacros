@@ -1,6 +1,7 @@
+from copy import deepcopy
+
 from .Species import *
 from .SpeciesList import SpeciesList
-
 
 
 class Cluster:
@@ -14,16 +15,16 @@ class Cluster:
         """
         Creates a new Cluster object
 
-        :parm site_types: tuple
+        :parm site_types: list
         :parm neighboring: list
-        :parm species: tuple
+        :parm species: list
         :parm multiplicity: int
         :parm cluster_energy: float
         """
-        self.site_types = site_types                  # e.g. ( "f", "f" )
+        self.site_types = site_types                  # e.g. [ "f", "f" ]
         self.neighboring = neighboring                # e.g. [ (1,2) ]
-        self.species = species                        # e.g. ( Species("H*",1), Species("H*",1) )
-        self.gas_species = gas_species                # e.g. ( Species("H2") )
+        self.species = species                        # e.g. [ Species("H*",1), Species("H*",1) ]
+        self.gas_species = gas_species                # e.g. [ Species("H2") ]
         self.multiplicity = multiplicity              # e.g. 2
         self.cluster_energy = cluster_energy          # Units eV
 
@@ -133,7 +134,7 @@ class Cluster:
         if( self.sites != 0 ):
             output += "  sites " + str(self.sites)+"\n"
 
-            if self.neighboring is not None:
+            if self.neighboring is not None and len(self.neighboring) > 0:
                 output += "  neighboring "
                 for i in range(len(self.neighboring)):
                     output += str(self.neighboring[i][0])+"-"+str(self.neighboring[i][1])
@@ -166,3 +167,42 @@ class Cluster:
         Returns the mass of the cluster in Da
         """
         return self.__mass
+
+
+    def simplify( self ) -> Cluster:
+        """
+        Returns a new cluster where empty sites and gas species are removed.
+        In case the cluster is fully empty None is returned
+        """
+        newCluster = deepcopy(self)
+
+        idSitesToRemove = []
+        for i in range(newCluster.sites):
+            if( newCluster.species[i] == Species("*") ):
+                idSitesToRemove.append(i)
+
+        if( len(idSitesToRemove) == newCluster.sites ):
+            return None
+
+        newCluster.sites = newCluster.sites - len(idSitesToRemove)
+        for id in idSitesToRemove:
+            newCluster.site_types.pop( id )
+            newCluster.species.pop( id )
+
+        if( newCluster.neighboring is not None and len(newCluster.neighboring) > 0 ):
+            idPairsToRemove = []
+            for id in idSitesToRemove:
+                for i,pair in enumerate(self.neighboring):
+                    print(id+1, pair[0], pair[1])
+                    if( id+1 == pair[0] or id+1 == pair[1] ):
+                        idPairsToRemove.append(i)
+
+            for id in idPairsToRemove:
+                newCluster.neighboring.pop( id )
+
+        newCluster.gas_species = []
+
+        newCluster.__updateLabel()
+
+        return newCluster
+
